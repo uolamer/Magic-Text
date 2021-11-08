@@ -12,13 +12,17 @@ pixels added the less damage done.
 It is not recommended to alter images with Magic Text on them without first
 removing the Magic Text with this tool as it could cause this tool not to
 recognize the Magic Text for removal.
+
 <hr>
+
 Commands:
+
     add     This adds Magic Text to an image
     remove  This removes Magic Text to an image
     prep    This creates a Magic Text image for use with the add command
 
 Options:
+
     -i      Input image filename for add, remove or prep (Required)
 
     -o      Output image filename for add, remove or prep (optional)
@@ -32,6 +36,7 @@ Options:
             not specified for add/remove and 6 for prep.
             Options: 5,6,7,8,9 (all compression is lossless)
 <hr>
+
 Examples:
 
 MagicText.exe add -i card.png -t text\WhiteText.wepb
@@ -47,7 +52,9 @@ MagicText.exe prep -i text\blacktext.png
 
     This will create blacktext.webp for use with the add command
     see notes below on required specs of input.
+    
 <hr>
+
 Notes on the prep input images:
 
     The input image should be the same aspect ratio of images it is to be
