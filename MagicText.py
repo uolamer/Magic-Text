@@ -1,3 +1,6 @@
+# To package up as executable, run this in command prompt:
+# (windows w/ UPX) C:\Python\Python39\Scripts\pyinstaller.exe --onefile --icon=MagicText.ico --upx-dir UPX\upx-3.96-win32 MagicText.py
+# Edit UPX directory as needed or omit the UPX flags to build without.
 import os
 import sys
 from PIL import Image
