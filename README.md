@@ -69,3 +69,12 @@ recognize the Magic Text for removal.
    corner with everything transparent other than the text itself.
     
    <b>See Examples directory for some samples</b>
+<hr>
+<h2>How this software works</h2>
+
+The short answer is we take the input image, remove the alpha layer, add back an alpha layer making all pixels non transparent (Alpha 255) and the magic text is added with an Alpha value of 254. In this process pixels are flat out replaced by the Magic Text. We also set key pixels in each corner to either Alpha 253 or Alpha 252 as a key to identify an image that has Magic Text. To remove the Magic Text we make sure the key exists and then remove the key by setting the Alpha of those corner pixels to 255. We then create a mask of all pixels that are below Alpha 255, in this case it that will be just the Magic Text we put there. This mask is sort of like using a magic wand in PhotoShop. We replace those pixels with something similar to content-aware fill in PhotoShop, in this case OpenCV Image Inpainting, to replace those pixels.
+
+<hr>
+<h2>Future considerations & improvments</h2>
+
+The way the key code works could be improved as it currently can leave a single pixel behind that was Magic Text if Magic Text was added to a corner pixel. This could be easily fixed in a future version. Basically any part of this program could be replaced with a future or better library and still work with existing images. Currently I am using a combination of Python Pillow and OpenCV. I originally was working with Pillow until I found OpenCV and it's Image Inpainting. Some methods are still using Pillow though they could be converted to OpenCV or Numpy code. From the little expermenting I did Pillow did a better job at compressing PNG at level 6 or higher than OpenCV and that is one reason I have not changed any code on that end. It should be possible to take advantage of CUDA or many other things. This code also could be converted to C++ or something else if there is a need/reason. For now this working code with the logic in place.
