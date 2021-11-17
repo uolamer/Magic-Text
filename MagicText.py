@@ -98,19 +98,22 @@ def add_text(input,output,compression,text):
                 im.putpixel( (x, y), (r, g, b, a) )
 
     # Create key to idenfity images that need processing later
-    # The key is simply setting all four corners to Alpha 253/252
-    # This is not quite perfect as it could leave a a pixel behind
-    # But it would only be a single pixel in the bleed edge.
+    # The key is simply reducing the alpha value of the corners
+    # by 1 while knowing near by pixels are 254/255
     txtp = im.load() #reusing old variable as it isnt needed anymore
 
-    r, g, b, a = txtp[0,0]
-    im.putpixel( (0, 0), (r, g, b, 253) )
+    r, g, b, a = txtp[0,0] # Read in corner pixel
+    a -= 1
+    im.putpixel( (0, 0), (r, g, b, a) )
     r, g, b, a = txtp[im.width-1, 0]
-    im.putpixel( (im.width-1, 0), (r, g, b, 253) )
+    a -= 1
+    im.putpixel( (im.width-1, 0), (r, g, b, a) )
     r, g, b, a = txtp[0, im.height-1]
-    im.putpixel( (0, im.height-1), (r, g, b, 252) )
+    a -= 1
+    im.putpixel( (0, im.height-1), (r, g, b, a) )
     r, g, b, a = txtp[im.width-1, im.height-1]
-    im.putpixel( (im.width-1, im.height-1), (r, g, b, 252) )
+    a -= 1
+    im.putpixel( (im.width-1, im.height-1), (r, g, b, a) )
 
     _, output_extension = os.path.splitext(output)
     if (output_extension.lower() == ".png" and compression < 6):
@@ -137,16 +140,11 @@ def remove_text(input,output,compression):
         sys.exit()
     
     #Verify key exists
-    if (im.shape[2] == 4 and im[0,0][3] == 253 and im[im.shape[0]-1,0][3] == 252 and im[0,im.shape[1]-1][3] == 253 and im[im.shape[0]-1,im.shape[1]-1][3] == 252):
-        # Remove Key by setting alpha of each corner to 255
-        (b, g, r, a) = im[0, 0]
-        im[0, 0] = (b, g, r, 255)
-        (b, g, r, a) = im[im.shape[0]-1, 0]
-        im[im.shape[0]-1, 0] = (b, g, r, 255)
-        (b, g, r, a) = im[0, im.shape[1]-1]
-        im[0, im.shape[1]-1] = (b, g, r, 255)
-        (b, g, r, a) = im[0, 0]
-        im[im.shape[0]-1, im.shape[1]-1] = (b, g, r, 255)
+    if (im.shape[2] == 4 and (im[0,0][3] == 254 or im[0,0][3] == 253) and (im[im.shape[0]-1,0][3] == 254 or im[im.shape[0]-1,0][3] == 253) and (im[0,im.shape[1]-1][3] == 254 or im[0,im.shape[1]-1][3] == 253) and (im[im.shape[0]-1,im.shape[1]-1][3] == 254 or im[im.shape[0]-1,im.shape[1]-1][3] == 253) and im[1,1][3] > 253 and im[im.shape[0]-2,1][3] > 253 and im[1,im.shape[1]-2][3] > 253 and im[im.shape[0]-2,im.shape[1]-2][3] > 253):
+        im[0,0][3] += 1 # Remove Key
+        im[im.shape[0]-1,0][3] += 1 # Remove Key
+        im[0,im.shape[1]-1][3] += 1 # Remove Key
+        im[im.shape[0]-1,im.shape[1]-1][3] += 1 # Remove Key
         _, mask = cv2.threshold(im[:, :, 3], 254, 255, cv2.THRESH_BINARY_INV) # Create a PROPER mask to idenfity Magic Text
         im = im[:,:,:3] # Drop Alpha layer as inpaint needs it removed
         im = cv2.inpaint(im, mask, 3, cv2.INPAINT_NS) # Using NS Method for Magic Text removal
